@@ -1,4 +1,4 @@
 all:
-	gcc main.c -o bin/main
+	gcc main.c src/*.c -Iinclude -o bin/main
 	./bin/main
 	
