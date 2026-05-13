@@ -11,6 +11,7 @@ int main(){
 
 		Update_movement();	
 		drawing_stuff();
+		
 		}
 	
 	CloseWindow();
