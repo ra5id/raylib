@@ -7,11 +7,12 @@ int main(){
 
 	InitWindow(WINDOW_W, WINDOW_H, "breakout");
 	SetTargetFPS(60);
-	while(WindowShouldClose()){
-	
-		drawing_stuff();
-	}
+	while(!WindowShouldClose()){
 
+		Update_movement();	
+		drawing_stuff();
+		}
+	
 	CloseWindow();
 	return 0;
 }
