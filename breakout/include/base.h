@@ -4,10 +4,6 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-
-#define PI 3.1415926536f
-
-
 typedef int8_t          i8;
 typedef int16_t         i16;
 typedef int32_t         i32;
