@@ -3,12 +3,17 @@
 
 #define WINDOW_W 800
 #define WINDOW_H 600
-#define CIRCLE_X ((float)WINDOW_W/2)
-#define CIRCLE_Y ((float)WINDOW_H/2)
 
 
-void drawing_stuff(); 
-void Update_movement();
+#include "base.h"
+
+typedef struct{
+	f32 x;
+	f32 y;
+}Vec2;
+
+void drawing_stuff(Vec2 *Cpos); 
+void Update_movement(Vec2 *Cpos, Vec2 *Cvel);
 
 
 #endif
