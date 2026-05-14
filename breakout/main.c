@@ -25,7 +25,7 @@ int main(){
 
 	while(!WindowShouldClose()){
 
-		
+		check_gameover(&Cpos);
 		Update_ball(&Cpos, &Cvel, &p);
 		Update_paddle(&p);
 		drawing_stuff(&Cpos, &p.rect);
