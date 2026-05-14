@@ -32,9 +32,12 @@ void Update_ball(Vec2 *Cpos, Vec2 *Cvel, Paddle *p){
 	if(Cpos->y < 0){
 		 Cvel->y *= -1;
 	}
-
-	Cpos->x += Cvel->x * dt;
-	Cpos->y += Cvel->y *dt;
+	if(Cpos->y > WINDOW_H+5){
+		 Cvel->x = 0;
+		 Cvel->y = 0;
+	}
+		Cpos->x += Cvel->x * dt;
+		Cpos->y += Cvel->y *dt;
 }
 
 void Update_paddle(Paddle *p){
@@ -62,19 +65,24 @@ void Update_paddle(Paddle *p){
 	p->rect.x += p->vel * dt;
 }
 
-void check_gameover(Vec2 *Cpos){
+	void check_gameover(Vec2 *Cpos, Vec2 *Cvel){
+;
 	bool running = true;
 	if(Cpos->y > WINDOW_H){
 		running = false;
-		ClearBackground(WHITE);
+	}
+	if(!running){	
 		i32 GAMEOVER_S = MeasureText("GAMEOVER",40);
 		i32 RESTART_S = MeasureText("press 'r' to restart", 20);
 		DrawText("GAMEOVER", (WINDOW_W/2)-(GAMEOVER_S/2),WINDOW_H/2-20,40,RED);
 		DrawText("press 'r' to restart", (WINDOW_W/2)-(RESTART_S/2),WINDOW_H/2+20,20,RED);
 		if(IsKeyPressed(KEY_R)){
 			running = true;
-		}
-
-		
+			ClearBackground(BLACK);
+			Cpos->x = WINDOW_W/2.0f;
+			Cpos->y = WINDOW_H/2.0f;
+			Cvel->x = 300;
+			Cvel->y = 300;
+		}	
 	}
 }

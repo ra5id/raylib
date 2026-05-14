@@ -6,7 +6,7 @@
 
 int main(){
 
-	Vec2 Cvel = {200,200};
+	Vec2 Cvel = {300,300};
 	Vec2 Cpos = {WINDOW_W/2.0f, WINDOW_H/2.0f};
 
 
@@ -25,7 +25,7 @@ int main(){
 
 	while(!WindowShouldClose()){
 
-		check_gameover(&Cpos);
+    check_gameover(&Cpos,&Cvel);
 		Update_ball(&Cpos, &Cvel, &p);
 		Update_paddle(&p);
 		drawing_stuff(&Cpos, &p.rect);

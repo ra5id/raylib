@@ -21,6 +21,6 @@ typedef struct{
 void drawing_stuff(Vec2 *Cpos, Rectangle *rect); 
 void Update_ball(Vec2 *Cpos, Vec2 *Cvel, Paddle *p);
 void Update_paddle(Paddle *p);
-void check_gameover(Vec2 *Cpos);
+void check_gameover(Vec2 *Cpos, Vec2 *Cvel);
 
 #endif
