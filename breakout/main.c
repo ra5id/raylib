@@ -1,10 +1,13 @@
 #include "base.h"
 #include <raylib.h>
 
-#define	WINDOW_WIDTH		800
-#define	WINDOW_HEIGHT		600
-#define PADDLE_ACC			600
-#define P_ACC_LIMIT			500
+#define	WINDOW_WIDTH			800
+#define	WINDOW_HEIGHT			600
+#define PADDLE_ACC				600
+#define P_ACC_LIMIT				500
+#define BALL_PADDLE_PUSH	0.35f
+#define BALL_MAX_SPEED		500.0f
+//#define BALL_MIN_SPEED	90.f
 
 typedef struct{
 	f32 x;
@@ -44,7 +47,16 @@ void update_ball(Vec2 *ball_pos, Vec2 *ball_vel, f32 *ball_radius, Paddle *pd){
 		 ball_pos->x > pd->xpos &&
 		 ball_pos->x < pd->xpos+pd->width)))
 	{
+		 ball_vel->x += pd->vel * BALL_PADDLE_PUSH;
+	
+	if(ball_vel->x > BALL_MAX_SPEED){
+     ball_vel->x = BALL_MAX_SPEED;
+  }
+	if(ball_vel->x < -BALL_MAX_SPEED){
+     ball_vel->x = -BALL_MAX_SPEED;
+	}
 		 ball_vel->y *= -1.0f;
+
 	}
 }
 
