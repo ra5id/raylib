@@ -41,10 +41,10 @@ int main(){
 	
 	InitWindow(WINDOW_WIDTH,WINDOW_HEIGHT,"breakout!");	
 	
-	f32 ball_x =		(WINDOW_WIDTH/2.0f);
-	f32 ball_y =		(WINDOW_HEIGHT/2.0f);
-	f32 ball_yvel =	500.0f;
-	f32 ball_xvel =	500.0f;
+	f32 ball_x =			(WINDOW_WIDTH/2.0f);
+	f32 ball_y =			(WINDOW_HEIGHT/2.0f);
+	f32 ball_yvel =		500.0f;
+	f32 ball_xvel =		500.0f;
 
 	Paddle pd = {	
 		.width = 50.0f,
