@@ -1,4 +1,4 @@
 all:
-	gcc main.c src/*.c -Iinclude -lraylib -o bin/main
+	gcc main.c -Iinclude -lraylib -o bin/main
 	./bin/main
 	
