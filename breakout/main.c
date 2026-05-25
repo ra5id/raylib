@@ -107,7 +107,7 @@ int main(){
 	Paddle pd = {	
 		.width = paddle_width,
 		.height = paddle_height,
-		.xpos = WINDOW_WIDTH/2.0f-paddle_width,
+		.xpos = WINDOW_WIDTH/2.0f-paddle_width/2.0f,
 		.ypos = WINDOW_HEIGHT-paddle_height,
 		.vel = 0.0f
 	};
@@ -144,14 +144,6 @@ int main(){
 		}
 
 		if(state == GAME_OVER_STATE){
-			ball_pos.x	=		WINDOW_WIDTH/2.0f;
-			ball_pos.y	=		WINDOW_HEIGHT/2.0f;
-			ball_vel.x	=		200.0f;
-			ball_vel.y	=		250.0f;		
-		  pd.xpos = WINDOW_WIDTH/2.0f-paddle_width,
-		  pd.ypos = WINDOW_HEIGHT-paddle_height,
-		  pd.vel = 0.0f;
-			
 			i16 text1_width = MeasureText("GAME OVER!!", 60);
 			i16 text2_width = MeasureText("PRESS 'R' TO RESTART!", 20);
 			i16 text3_width = MeasureText("TAB TO RETURN TO MAIN MENU", 20);
@@ -160,8 +152,15 @@ int main(){
 			DrawText("PRESS 'R' TO RESTART!",(WINDOW_WIDTH/2)-text2_width/2, 265,20, GREEN);
 			DrawText("TAB TO RETURN TO MAIN MENU",(WINDOW_WIDTH/2)-text3_width/2, 285,20, YELLOW);
 			DrawText("ESC TO QUIT",(WINDOW_WIDTH/2)-text4_width/2, 305,20, RED);
-		
+				
 			if(IsKeyPressed(KEY_R)){
+				ball_pos.x	=		WINDOW_WIDTH/2.0f;
+				ball_pos.y	=		WINDOW_HEIGHT/2.0f;
+				ball_vel.x	=		200.0f;
+				ball_vel.y	=		250.0f;		
+				pd.xpos = WINDOW_WIDTH/2.0f-paddle_width/2.0f,
+				pd.ypos = WINDOW_HEIGHT-paddle_height,
+				pd.vel = 0.0f;
 				state = PLAYING_STATE;
 			}
 			if(IsKeyPressed(KEY_TAB)){
