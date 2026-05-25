@@ -127,6 +127,13 @@ int main(){
 			DrawText("ESC TO QUIT",(WINDOW_WIDTH/2)-text3_width/2, 285,20, RED);
 		
 			if(IsKeyPressed(KEY_SPACE)){
+				ball_pos.x	=		WINDOW_WIDTH/2.0f;
+				ball_pos.y	=		WINDOW_HEIGHT/2.0f;
+				ball_vel.x	=		200.0f;
+				ball_vel.y	=		250.0f;		
+				pd.xpos = WINDOW_WIDTH/2.0f-paddle_width/2.0f;
+				pd.ypos = WINDOW_HEIGHT-paddle_height;
+				pd.vel = 0.0f;
 				state = PLAYING_STATE;
 			}
 		}
@@ -158,8 +165,8 @@ int main(){
 				ball_pos.y	=		WINDOW_HEIGHT/2.0f;
 				ball_vel.x	=		200.0f;
 				ball_vel.y	=		250.0f;		
-				pd.xpos = WINDOW_WIDTH/2.0f-paddle_width/2.0f,
-				pd.ypos = WINDOW_HEIGHT-paddle_height,
+				pd.xpos = WINDOW_WIDTH/2.0f-paddle_width/2.0f;
+				pd.ypos = WINDOW_HEIGHT-paddle_height;
 				pd.vel = 0.0f;
 				state = PLAYING_STATE;
 			}
