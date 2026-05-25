@@ -27,9 +27,6 @@ void update_ball(f32 *ball_x, f32 *ball_y, f32 *ball_xvel, f32 *ball_yvel){
 	if(*ball_y > WINDOW_HEIGHT-ball_radius || *ball_y < ball_radius){
 			*ball_yvel *= -1.0f;
 	}
-	if(ball_radius > 10.0f){
-		ball_radius -= 30.0f*dt;
-	}
 }
 
 void update_paddle(){
@@ -41,8 +38,8 @@ int main(){
 	
 	InitWindow(WINDOW_WIDTH,WINDOW_HEIGHT,"breakout!");	
 	
-	f32 ball_x =			(WINDOW_WIDTH/2.0f);
-	f32 ball_y =			(WINDOW_HEIGHT/2.0f);
+	f32 ball_x		=		(WINDOW_WIDTH/2.0f);
+	f32 ball_y		=		(WINDOW_HEIGHT/2.0f);
 	f32 ball_yvel =		500.0f;
 	f32 ball_xvel =		500.0f;
 
