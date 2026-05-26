@@ -35,17 +35,17 @@ void update_ball(Vec2 *ball_pos, Vec2 *ball_vel, f32 *ball_radius, Paddle *pd){
 	ball_pos->y += ball_vel->y * dt;
 	ball_pos->x += ball_vel->x * dt;
 	
-	if(ball_pos->x > WINDOW_WIDTH-*ball_radius ||
-		 ball_pos->x < *ball_radius)
+	if(ball_pos->x >= WINDOW_WIDTH-*ball_radius ||
+		 ball_pos->x <= *ball_radius)
 	{
 		 ball_vel->x *= -1.0f;
 	}
 
-	if(ball_pos->y < *ball_radius ||
+	if(ball_pos->y <= *ball_radius ||
 	  (ball_vel->y >0 && (
 		 ball_pos->y >= pd->ypos-*ball_radius &&
-		 ball_pos->x > pd->xpos &&
-		 ball_pos->x < pd->xpos+pd->width)))
+		 ball_pos->x >= pd->xpos &&
+		 ball_pos->x <= pd->xpos+pd->width)))
 	{
 		 ball_vel->x += pd->vel * BALL_PADDLE_PUSH;
 	
