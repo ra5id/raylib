@@ -1,4 +1,5 @@
 #include "base.h"
+#include <math.h>
 #include <raylib.h>
 
 #define	WINDOW_WIDTH			800
@@ -35,50 +36,57 @@ void update_ball(Vec2 *ball_pos, Vec2 *ball_vel, f32 *ball_radius, Paddle *pd){
 	ball_pos->y += ball_vel->y * dt;
 	ball_pos->x += ball_vel->x * dt;
 	
-	if(ball_pos->x >= WINDOW_WIDTH-*ball_radius ||
-		 ball_pos->x <= *ball_radius)
+	if(ball_pos->x > WINDOW_WIDTH-*ball_radius ||
+		 ball_pos->x < *ball_radius)
 	{
-		 ball_vel->x *= -1.0f;
+		 ball_vel->x *= -fabsf(1.0f);
 	}
 
-	if(ball_pos->y <= *ball_radius ||
-	  (ball_vel->y >0 && (
-		 ball_pos->y >= pd->ypos-*ball_radius &&
-		 ball_pos->x >= pd->xpos &&
-		 ball_pos->x <= pd->xpos+pd->width)))
+	if(ball_vel->x > BALL_MAX_SPEED)
 	{
-		 ball_vel->x += pd->vel * BALL_PADDLE_PUSH;
-	
-	if(ball_vel->x > BALL_MAX_SPEED){
      ball_vel->x = BALL_MAX_SPEED;
   }
-	if(ball_vel->x < -BALL_MAX_SPEED){
+
+	if(ball_vel->x < -BALL_MAX_SPEED)
+	{
      ball_vel->x = -BALL_MAX_SPEED;
 	}
-		 ball_vel->y *= -1.0f;
 
+	if(ball_pos->y < *ball_radius-0.3f)
+	{
+		 ball_vel->y *= -1.0f;
 	}
+
+	if(ball_vel->y >0 && (
+		 ball_pos->y > pd->ypos-*ball_radius &&
+		 ball_pos->x > pd->xpos &&
+		 ball_pos->x < pd->xpos+pd->width))
+	{
+		 ball_vel->x += pd->vel * BALL_PADDLE_PUSH;
+		 ball_vel->y *= -1.0f;
+	}
+
 }
 
 void update_paddle(Paddle *pd){
 	f32 dt = GetFrameTime();
 
-	if(IsKeyDown(KEY_A)){
+	if(IsKeyDown(KEY_A)|| IsKeyDown(KEY_LEFT)){
 		if(pd->vel > 0){
 			 pd->vel = 0;
 		}
 		pd->vel -= PADDLE_ACC * dt;
 	}
 
-	if(IsKeyDown(KEY_D)){
+	if(IsKeyDown(KEY_D)|| IsKeyDown(KEY_RIGHT)){
 		if(pd->vel < 0){
 			 pd->vel = 0;
 		}
 		pd->vel += PADDLE_ACC * dt;
 	}
 	
-	if(!IsKeyDown(KEY_A) &&
-		 !IsKeyDown(KEY_D))
+	if((!IsKeyDown(KEY_A) && !IsKeyDown(KEY_LEFT)) &&
+	   (!IsKeyDown(KEY_D) && !IsKeyDown(KEY_RIGHT)))
 	{
 			pd->vel -= pd->vel *3.0f * dt;
 	}
@@ -194,3 +202,4 @@ int main(){
 	CloseWindow();
 	return 0;
 }
+
