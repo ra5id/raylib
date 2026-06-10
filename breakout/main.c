@@ -1,6 +1,7 @@
 #include "base.h"
 #include <math.h>
 #include <raylib.h>
+#include <stdbool.h>
 
 #define	WINDOW_WIDTH			800
 #define	WINDOW_HEIGHT			600
@@ -8,7 +9,9 @@
 #define P_ACC_LIMIT				500
 #define BALL_PADDLE_PUSH	0.35f
 #define BALL_MAX_SPEED		500.0f
-//#define BALL_MIN_SPEED	90.f
+#define BRICK_ROWS 7
+#define BRICK_COLS 10
+
 
 typedef struct{
 	f32 x;
@@ -28,6 +31,14 @@ typedef enum{
 	PLAYING_STATE,
 	GAME_OVER_STATE
 }GameState;
+
+typedef struct{
+	f32 x;
+	f32 y;
+	f32 width;
+	f32 height;
+	bool is_alive;
+}Brick;
 
 
 void update_ball(Vec2 *ball_pos, Vec2 *ball_vel, f32 *ball_radius, Paddle *pd){
@@ -131,6 +142,21 @@ int main(){
 		.ypos = WINDOW_HEIGHT-paddle_height,
 		.vel = 0.0f
 	};
+
+		Brick bricks[BRICK_ROWS][BRICK_COLS];
+
+
+	for(i32 row = 0; row < BRICK_ROWS; row++){
+		for(i32 col = 0; col < BRICK_COLS; col++){
+			Brick *brick = &bricks[row][col];
+
+			brick->x = 10.0f + col * 75.0f;
+			brick->y = 10.0f + row * 25.0f;
+			brick->width = 70.0f;
+			brick->height = 20.f;
+			brick->is_alive = true;
+		}
+	}
 	
 	GameState state = MENU_STATE;
 
@@ -159,9 +185,25 @@ int main(){
 		}
 
 		if(state == PLAYING_STATE){
+
 			update_paddle(&pd);
 			update_ball(&ball_pos, &ball_vel, &ball_radius, &pd);
 			
+			for(i32 row = 0; row < BRICK_ROWS; row++){
+				for(i32 col = 0; col < BRICK_COLS; col++){
+					Brick *brick = &bricks[row][col];
+					if(brick->is_alive){
+						DrawRectangle(
+							brick->x,
+							brick->y,
+							brick->width,
+							brick->height,
+							BEIGE
+						);
+					}
+				}
+			}
+
 			DrawCircle(ball_pos.x,ball_pos.y, ball_radius , RED);
 			DrawRectangle(pd.xpos,pd.ypos,pd.width, pd.height, BEIGE);
 			
