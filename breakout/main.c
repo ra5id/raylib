@@ -1,5 +1,4 @@
 #include "base.h"
-#include <math.h>
 #include <raylib.h>
 #include <stdbool.h>
 
@@ -9,8 +8,8 @@
 #define P_ACC_LIMIT				500
 #define BALL_PADDLE_PUSH	0.35f
 #define BALL_MAX_SPEED		500.0f
-#define BRICK_ROWS 7
-#define BRICK_COLS 10
+#define BRICK_ROWS				7
+#define BRICK_COLS				10
 
 
 typedef struct{
@@ -50,7 +49,7 @@ void update_ball(Vec2 *ball_pos, Vec2 *ball_vel, f32 *ball_radius, Paddle *pd){
 	if(ball_pos->x > WINDOW_WIDTH-*ball_radius ||
 		 ball_pos->x < *ball_radius)
 	{
-		 ball_vel->x *= -fabsf(1.0f);
+		 ball_vel->x *= -1.0f;
 	}
 
 	if(ball_vel->x > BALL_MAX_SPEED)
@@ -122,7 +121,7 @@ void update_paddle(Paddle *pd){
 
 }
 
-void update_bricks(Brick bricks[BRICK_ROWS][BRICK_COLS], Vec2 *ball_pos, Vec2 *ball_vel, f32 ball_radius){
+void update_bricks(Brick bricks[BRICK_ROWS][BRICK_COLS], Vec2 *ball_pos, Vec2 *ball_vel, f32 ball_radius, i32 *score, i32 *game_score){
 	for(i32 row = 0; row < BRICK_ROWS; row ++){
 		for(i32 col = 0; col < BRICK_COLS; col++){
 			Brick *brick = &bricks[row][col];
@@ -139,6 +138,10 @@ void update_bricks(Brick bricks[BRICK_ROWS][BRICK_COLS], Vec2 *ball_pos, Vec2 *b
 			if(collision_x && collision_y){
 				brick->is_alive = false;
 				ball_vel->y *= -1.0f;
+				*score += 1;
+				*game_score += 1;
+
+
 			}
 		}
 	}		
@@ -146,10 +149,9 @@ void update_bricks(Brick bricks[BRICK_ROWS][BRICK_COLS], Vec2 *ball_pos, Vec2 *b
 
 void reset_bricks(Brick bricks[BRICK_ROWS][BRICK_COLS])
   {
-      for (i32 row = 0; row < BRICK_ROWS; row++) {
-          for (i32 col = 0; col < BRICK_COLS; col++) {
-              Brick *brick = &bricks[row][col];
-
+    for (i32 row = 0; row < BRICK_ROWS; row++) {
+        for (i32 col = 0; col < BRICK_COLS; col++) {
+            Brick *brick = &bricks[row][col];
               brick->x = 10.0f + col * 75.0f;
               brick->y = 10.0f + row * 25.0f;
               brick->width = 70.0f;
@@ -171,6 +173,8 @@ int main(){
 
 	f32 paddle_width	= 90.0f;
 	f32 paddle_height	= 7.0f;
+	i32 score = 0;
+	i32 game_score = 0;
 	
 	Brick bricks[BRICK_ROWS][BRICK_COLS];
 
@@ -197,6 +201,7 @@ int main(){
 			DrawText("ESC TO QUIT",(WINDOW_WIDTH/2)-text3_width/2, 285,20, RED);
 		
 			if(IsKeyPressed(KEY_SPACE)){
+				game_score = 0;
 				reset_bricks(bricks);
 				ball_pos.x	=		WINDOW_WIDTH/2.0f;
 				ball_pos.y	=		WINDOW_HEIGHT/2.0f;
@@ -213,7 +218,7 @@ int main(){
 
 			update_paddle(&pd);
 			update_ball(&ball_pos, &ball_vel, &ball_radius, &pd);
-		  update_bricks(bricks, &ball_pos,&ball_vel,ball_radius);
+			update_bricks(bricks, &ball_pos,&ball_vel,ball_radius,&score, &game_score);
 			
 			for(i32 row = 0; row < BRICK_ROWS; row++){
 				for(i32 col = 0; col < BRICK_COLS; col++){
@@ -232,6 +237,9 @@ int main(){
 
 			DrawCircle(ball_pos.x,ball_pos.y, ball_radius , RED);
 			DrawRectangle(pd.xpos,pd.ypos,pd.width, pd.height, BEIGE);
+			DrawText(TextFormat("TotalScore: %d",score), 5, WINDOW_HEIGHT-35, 15, BLUE);
+			DrawText(TextFormat("Score: %d",game_score), 5, WINDOW_HEIGHT-15, 15, WHITE);
+
 			
 			if(ball_pos.y > WINDOW_HEIGHT+ball_radius){
 				state = GAME_OVER_STATE;
@@ -249,6 +257,7 @@ int main(){
 			DrawText("ESC TO QUIT",(WINDOW_WIDTH/2)-text4_width/2, 305,20, RED);
 				
 			if(IsKeyPressed(KEY_R)){
+				game_score = 0;
 				reset_bricks(bricks);
 				ball_pos.x	=		WINDOW_WIDTH/2.0f;
 				ball_pos.y	=		WINDOW_HEIGHT/2.0f;
