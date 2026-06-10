@@ -175,6 +175,7 @@ int main(){
 	f32 paddle_height	= 7.0f;
 	i32 score = 0;
 	i32 game_score = 0;
+	i32 high_score = 0;
 	
 	Brick bricks[BRICK_ROWS][BRICK_COLS];
 
@@ -185,6 +186,8 @@ int main(){
 		.ypos = WINDOW_HEIGHT-paddle_height,
 		.vel = 0.0f
 	};
+
+	bool new_high_score = false;
 	
 	GameState state = MENU_STATE;
 
@@ -242,6 +245,13 @@ int main(){
 
 			
 			if(ball_pos.y > WINDOW_HEIGHT+ball_radius){
+				if(game_score > high_score){
+			   	 high_score = game_score;
+					 new_high_score = true;
+			  }else{
+					new_high_score = false;
+				}
+
 				state = GAME_OVER_STATE;
 			}
 		}
@@ -251,11 +261,17 @@ int main(){
 			i16 text2_width = MeasureText("PRESS 'R' TO RESTART!", 20);
 			i16 text3_width = MeasureText("TAB TO RETURN TO MAIN MENU", 20);
 			i16 text4_width = MeasureText("ESC TO QUIT", 20);
+			i16 text5_width = MeasureText(TextFormat("NEW HIGHSCORE: %d!!!",high_score), 25);
 			DrawText("GAME OVER!!",(WINDOW_WIDTH/2)-text1_width/2, 200,60, BLUE);
 			DrawText("PRESS 'R' TO RESTART!",(WINDOW_WIDTH/2)-text2_width/2, 265,20, GREEN);
 			DrawText("TAB TO RETURN TO MAIN MENU",(WINDOW_WIDTH/2)-text3_width/2, 285,20, YELLOW);
 			DrawText("ESC TO QUIT",(WINDOW_WIDTH/2)-text4_width/2, 305,20, RED);
+			if(new_high_score){
+				DrawText(TextFormat("NEW HIGHSCORE: %d!!!",high_score),(WINDOW_WIDTH/2)-text5_width/2, 500,20, WHITE);
 				
+			}
+
+
 			if(IsKeyPressed(KEY_R)){
 				game_score = 0;
 				reset_bricks(bricks);
