@@ -261,7 +261,7 @@ int main(){
 			i16 text2_width = MeasureText("PRESS 'R' TO RESTART!", 20);
 			i16 text3_width = MeasureText("TAB TO RETURN TO MAIN MENU", 20);
 			i16 text4_width = MeasureText("ESC TO QUIT", 20);
-			i16 text5_width = MeasureText(TextFormat("NEW HIGHSCORE: %d!!!",high_score), 25);
+			i16 text5_width = MeasureText(TextFormat("NEW HIGHSCORE: %d!!!",high_score), 20);
 			DrawText("GAME OVER!!",(WINDOW_WIDTH/2)-text1_width/2, 200,60, BLUE);
 			DrawText("PRESS 'R' TO RESTART!",(WINDOW_WIDTH/2)-text2_width/2, 265,20, GREEN);
 			DrawText("TAB TO RETURN TO MAIN MENU",(WINDOW_WIDTH/2)-text3_width/2, 285,20, YELLOW);
