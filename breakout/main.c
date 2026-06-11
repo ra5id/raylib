@@ -121,7 +121,7 @@ void update_paddle(Paddle *pd){
 
 }
 
-void update_bricks(Brick bricks[BRICK_ROWS][BRICK_COLS], Vec2 *ball_pos, Vec2 *ball_vel, f32 ball_radius, i32 *score, i32 *game_score){
+void update_bricks(Brick bricks[BRICK_ROWS][BRICK_COLS], Vec2 *ball_pos, Vec2 *ball_vel, f32 ball_radius, i32 *score, i32 *game_score, Sound sfx){
 	for(i32 row = 0; row < BRICK_ROWS; row ++){
 		for(i32 col = 0; col < BRICK_COLS; col++){
 			Brick *brick = &bricks[row][col];
@@ -140,8 +140,7 @@ void update_bricks(Brick bricks[BRICK_ROWS][BRICK_COLS], Vec2 *ball_pos, Vec2 *b
 				ball_vel->y *= -1.0f;
 				*score += 1;
 				*game_score += 1;
-
-
+				PlaySound(sfx);
 			}
 		}
 	}		
@@ -165,6 +164,7 @@ void reset_bricks(Brick bricks[BRICK_ROWS][BRICK_COLS])
 int main(){
 	
 	InitWindow(WINDOW_WIDTH,WINDOW_HEIGHT,"breakout!");	
+	InitAudioDevice();
 	
 	Vec2 ball_pos	=	{WINDOW_WIDTH/2.0f,
 									 WINDOW_HEIGHT/2.0f};
@@ -186,6 +186,9 @@ int main(){
 		.ypos = WINDOW_HEIGHT-paddle_height,
 		.vel = 0.0f
 	};
+
+	Sound sfx_1_pop = LoadSound("SFX/POP1.wav");
+	Music bg_sfx = LoadMusicStream("SFX/music1.ogg");
 
 	bool new_high_score = false;
 	
@@ -213,15 +216,17 @@ int main(){
 				pd.xpos = WINDOW_WIDTH/2.0f-paddle_width/2.0f;
 				pd.ypos = WINDOW_HEIGHT-paddle_height;
 				pd.vel = 0.0f;
+
+				PlayMusicStream(bg_sfx);
 				state = PLAYING_STATE;
 			}
 		}
 
 		if(state == PLAYING_STATE){
-
+			
 			update_paddle(&pd);
 			update_ball(&ball_pos, &ball_vel, &ball_radius, &pd);
-			update_bricks(bricks, &ball_pos,&ball_vel,ball_radius,&score, &game_score);
+			update_bricks(bricks, &ball_pos,&ball_vel,ball_radius,&score, &game_score, sfx_1_pop);
 			
 			for(i32 row = 0; row < BRICK_ROWS; row++){
 				for(i32 col = 0; col < BRICK_COLS; col++){
@@ -238,6 +243,7 @@ int main(){
 				}
 			}
 
+			UpdateMusicStream(bg_sfx);
 			DrawCircle(ball_pos.x,ball_pos.y, ball_radius , RED);
 			DrawRectangle(pd.xpos,pd.ypos,pd.width, pd.height, BEIGE);
 			DrawText(TextFormat("TotalScore: %d",score), 5, WINDOW_HEIGHT-35, 15, BLUE);
@@ -251,7 +257,7 @@ int main(){
 			  }else{
 					new_high_score = false;
 				}
-
+				StopMusicStream(bg_sfx);
 				state = GAME_OVER_STATE;
 			}
 		}
@@ -283,6 +289,8 @@ int main(){
 				pd.ypos = WINDOW_HEIGHT-paddle_height;
 				pd.vel = 0.0f;
 				state = PLAYING_STATE;
+				StopMusicStream(bg_sfx);
+				PlayMusicStream(bg_sfx);
 			}
 			if(IsKeyPressed(KEY_TAB)){
 				state = MENU_STATE;
@@ -292,7 +300,10 @@ int main(){
 		EndDrawing();
 		
 	}
-
+	
+	UnloadSound(sfx_1_pop);
+	UnloadMusicStream(bg_sfx);
+	CloseAudioDevice();
 	CloseWindow();
 	return 0;
 }
