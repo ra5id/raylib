@@ -28,7 +28,8 @@ typedef struct{
 typedef enum{
 	MENU_STATE,
 	PLAYING_STATE,
-	GAME_OVER_STATE
+	GAME_OVER_STATE,
+	GAME_PAUSE_MENU
 }GameState;
 
 typedef struct{
@@ -40,16 +41,20 @@ typedef struct{
 }Brick;
 
 
-void update_ball(Vec2 *ball_pos, Vec2 *ball_vel, f32 *ball_radius, Paddle *pd){
+void update_ball(Vec2 *ball_pos, Vec2 *ball_vel, f32 ball_radius, Paddle *pd){
 	f32 dt = GetFrameTime();
 
 	ball_pos->y += ball_vel->y * dt;
 	ball_pos->x += ball_vel->x * dt;
 	
-	if(ball_pos->x > WINDOW_WIDTH-*ball_radius ||
-		 ball_pos->x < *ball_radius)
+	if(ball_pos->x > WINDOW_WIDTH - ball_radius)
 	{
+		 ball_pos->x = WINDOW_WIDTH - ball_radius;
 		 ball_vel->x *= -1.0f;
+	}
+  if(ball_pos->x < ball_radius){
+		ball_pos->x = ball_radius;
+		ball_vel->x *= -1.0f;
 	}
 
 	if(ball_vel->x > BALL_MAX_SPEED)
@@ -62,15 +67,24 @@ void update_ball(Vec2 *ball_pos, Vec2 *ball_vel, f32 *ball_radius, Paddle *pd){
      ball_vel->x = -BALL_MAX_SPEED;
 	}
 
-	if(ball_pos->y < *ball_radius-0.3f)
+	if(ball_pos->y < ball_radius)
 	{
+	   ball_pos->y = ball_radius;
 		 ball_vel->y *= -1.0f;
 	}
 
-	if(ball_vel->y >0 && (
-		 ball_pos->y > pd->ypos-*ball_radius &&
-		 ball_pos->x > pd->xpos &&
-		 ball_pos->x < pd->xpos+pd->width))
+	bool collision = CheckCollisionCircleRec((Vector2){
+																					  ball_pos->x,
+																						ball_pos->y},
+																						ball_radius,
+
+																						(Rectangle){
+																						pd->xpos,
+																						pd->ypos,
+																						pd->width,
+																						pd->height});
+
+	if(ball_vel->y >0 && collision)
 	{
 		 ball_vel->x += pd->vel * BALL_PADDLE_PUSH;
 		 ball_vel->y *= -1.0f;
@@ -129,13 +143,19 @@ void update_bricks(Brick bricks[BRICK_ROWS][BRICK_COLS], Vec2 *ball_pos, Vec2 *b
 				continue;
 			}
 
-			bool collision_x = (ball_pos->x+ball_radius) > brick->x && 
-												 (ball_pos->x+ball_radius) < (brick->x + brick->width);
+			bool collision = CheckCollisionCircleRec((Vector2){
+																								ball_pos->x,
+																								ball_pos->y},
+																								ball_radius,
+																								
+																								(Rectangle){
+																								brick->x,
+																								brick->y,
+																								brick->width,
+																								brick->height
+																								});
 
-			bool collision_y = (ball_pos->y+ball_radius) < (brick->y + brick->height) && 
-												 (ball_pos->y+ball_radius) > brick->y;
-
-			if(collision_x && collision_y){
+				if(collision){
 				brick->is_alive = false;
 				ball_vel->y *= -1.0f;
 				*score += 1;
@@ -225,7 +245,7 @@ int main(){
 		if(state == PLAYING_STATE){
 			
 			update_paddle(&pd);
-			update_ball(&ball_pos, &ball_vel, &ball_radius, &pd);
+			update_ball(&ball_pos, &ball_vel, ball_radius, &pd);
 			update_bricks(bricks, &ball_pos,&ball_vel,ball_radius,&score, &game_score, sfx_1_pop);
 			
 			for(i32 row = 0; row < BRICK_ROWS; row++){
@@ -249,6 +269,10 @@ int main(){
 			DrawText(TextFormat("TotalScore: %d",score), 5, WINDOW_HEIGHT-35, 15, BLUE);
 			DrawText(TextFormat("Score: %d",game_score), 5, WINDOW_HEIGHT-15, 15, WHITE);
 
+			if(IsKeyPressed(KEY_T)){
+				state = GAME_PAUSE_MENU;
+			}
+
 			
 			if(ball_pos.y > WINDOW_HEIGHT+ball_radius){
 				if(game_score > high_score){
@@ -260,6 +284,10 @@ int main(){
 				StopMusicStream(bg_sfx);
 				state = GAME_OVER_STATE;
 			}
+		}
+
+		if(state == GAME_PAUSE_MENU){
+			
 		}
 
 		if(state == GAME_OVER_STATE){
