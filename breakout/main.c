@@ -171,14 +171,30 @@ void reset_bricks(Brick bricks[BRICK_ROWS][BRICK_COLS])
     for (i32 row = 0; row < BRICK_ROWS; row++) {
         for (i32 col = 0; col < BRICK_COLS; col++) {
             Brick *brick = &bricks[row][col];
-              brick->x = 10.0f + col * 75.0f;
-              brick->y = 10.0f + row * 25.0f;
+              brick->x = 27.5f + col * 75.0f;
+              brick->y = 20.0f + row * 25.0f;
               brick->width = 70.0f;
               brick->height = 20.0f;
               brick->is_alive = true;
           }
       }
   }
+
+void reset_game(Vec2 *ball_pos, Vec2 *ball_vel, Paddle *pd, i32 *game_score, Brick bricks[BRICK_ROWS][BRICK_COLS], f32 paddle_width, f32 paddle_height, Music bg_sfx, GameState *state){
+		    *game_score = 0;
+				reset_bricks(bricks);
+				ball_pos->x	=		WINDOW_WIDTH/2.0f;
+				ball_pos->y	=		WINDOW_HEIGHT/2.0f;
+				ball_vel->x	=		200.0f;
+				ball_vel->y	=		250.0f;		
+				pd->xpos = WINDOW_WIDTH/2.0f-paddle_width/2.0f;
+				pd->ypos = WINDOW_HEIGHT-paddle_height;
+				pd->vel = 0.0f;
+				*state = PLAYING_STATE;
+				StopMusicStream(bg_sfx);
+				PlayMusicStream(bg_sfx);
+
+}
 
 
 int main(){
@@ -227,18 +243,15 @@ int main(){
 			DrawText("ESC TO QUIT",(WINDOW_WIDTH/2)-text3_width/2, 285,20, RED);
 		
 			if(IsKeyPressed(KEY_SPACE)){
-				game_score = 0;
-				reset_bricks(bricks);
-				ball_pos.x	=		WINDOW_WIDTH/2.0f;
-				ball_pos.y	=		WINDOW_HEIGHT/2.0f;
-				ball_vel.x	=		200.0f;
-				ball_vel.y	=		250.0f;		
-				pd.xpos = WINDOW_WIDTH/2.0f-paddle_width/2.0f;
-				pd.ypos = WINDOW_HEIGHT-paddle_height;
-				pd.vel = 0.0f;
-
-				PlayMusicStream(bg_sfx);
-				state = PLAYING_STATE;
+				reset_game(&ball_pos,
+									 &ball_vel,
+									 &pd,
+									 &game_score,
+									 bricks,
+									 paddle_width,
+									 paddle_height,
+									 bg_sfx,
+									 &state);										 	
 			}
 		}
 
@@ -271,6 +284,7 @@ int main(){
 
 			if(IsKeyPressed(KEY_T)){
 				state = GAME_PAUSE_MENU;
+				PauseMusicStream(bg_sfx);
 			}
 
 			
@@ -287,8 +301,16 @@ int main(){
 		}
 
 		if(state == GAME_PAUSE_MENU){
-			
-		}
+				if(IsKeyPressed(KEY_SPACE)){
+				state = PLAYING_STATE;
+				ResumeMusicStream(bg_sfx);
+				}
+				
+				if(IsKeyPressed(KEY_TAB)){
+				state = MENU_STATE;
+				}
+
+				}
 
 		if(state == GAME_OVER_STATE){
 			i16 text1_width = MeasureText("GAME OVER!!", 60);
@@ -307,19 +329,17 @@ int main(){
 
 
 			if(IsKeyPressed(KEY_R)){
-				game_score = 0;
-				reset_bricks(bricks);
-				ball_pos.x	=		WINDOW_WIDTH/2.0f;
-				ball_pos.y	=		WINDOW_HEIGHT/2.0f;
-				ball_vel.x	=		200.0f;
-				ball_vel.y	=		250.0f;		
-				pd.xpos = WINDOW_WIDTH/2.0f-paddle_width/2.0f;
-				pd.ypos = WINDOW_HEIGHT-paddle_height;
-				pd.vel = 0.0f;
-				state = PLAYING_STATE;
-				StopMusicStream(bg_sfx);
-				PlayMusicStream(bg_sfx);
-			}
+				reset_game(&ball_pos,
+									 &ball_vel,
+									 &pd,
+									 &game_score,
+									 bricks,
+									 paddle_width,
+									 paddle_height,
+									 bg_sfx,
+									 &state);	
+									 }
+
 			if(IsKeyPressed(KEY_TAB)){
 				state = MENU_STATE;
 			}
