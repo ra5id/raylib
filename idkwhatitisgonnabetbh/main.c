@@ -14,6 +14,7 @@
 #define LEFT_SIDE_WINDOW_CENTER_X 320.0f
 #define RIGHT_SIDE_WINDOW_CENTER_X 960.0f
 
+#define MAX_BULLETS 100
 
 typedef enum{
 	START_MENU_STATE,
@@ -26,12 +27,22 @@ typedef struct{
 	f32 radius;
 	Vector2 pos;
 	Vector2 vel;
+	Color color; 
 }Player;
 
 typedef struct{
-	i16 radius;
+	f32 radius;
 	Vector2 pos;
+	Color color; 
 }Button;
+
+typedef struct{
+	f32 radius;
+	Vector2 pos;
+	Vector2 vel;
+	Color color; 
+	bool active;
+}Bullets;
 
 void update_player(Player *p1, Player *p2, Rectangle *boundary)
 {
@@ -105,8 +116,10 @@ void update_player(Player *p1, Player *p2, Rectangle *boundary)
 	}
 }
 
-void level_one(Button *b1, Button *b2, Player *p1, Player *p2, Rectangle *pl, Rectangle *pr, GameState *Game)
+void level_one(Button *b1, Button *b2, Player *p1, Player *p2, Rectangle *pl, Rectangle *pr, Bullets *bullet1,Bullets *bullet2, GameState *Game)
 {
+	f32 dt = GetFrameTime();
+	
 	bool pleft_collision_check =
 	{
 		CheckCollisionCircleRec(p1->pos,p1->radius,*pl)
@@ -128,6 +141,45 @@ void level_one(Button *b1, Button *b2, Player *p1, Player *p2, Rectangle *pl, Re
 			p2->pos.y = pr->y-p2->radius;
 		}
 	}
+	
+	for(int i = 0; i< MAX_BULLETS; i++){
+		if(IsKeyPressed(KEY_SPACE)){
+			if(!bullet1[i].active){
+				bullet1[i].active = true;
+				bullet1[i].pos = p1->pos;
+				bullet1[i].vel = (Vector2){0.0f,1500.0f};
+				break;
+			}
+
+		}
+		if(bullet1[i].active){
+			bullet1[i].pos.y += bullet1[i].vel.y * dt;
+			if(bullet1[i].pos.y > WINDOW_HEIGHT){
+				bullet1[i].active = false;
+			}
+		}
+	}
+	
+	for(int i = 0; i< MAX_BULLETS; i++){
+		if(IsKeyPressed(KEY_SPACE)){
+			if(!bullet2[i].active){
+				bullet2[i].active = true;
+				bullet2[i].pos = p2->pos;
+				bullet2[i].vel = (Vector2){0.0f,1500.0f};
+				break;
+			}
+
+		}
+		if(bullet2[i].active){
+			bullet2[i].pos.y += bullet2[i].vel.y * dt;
+			if(bullet2[i].pos.y > WINDOW_HEIGHT){
+				bullet2[i].active = false;
+			}
+		}
+	}
+	
+	
+	
 
 	bool p1_button_collision = 
 	{
@@ -138,8 +190,7 @@ void level_one(Button *b1, Button *b2, Player *p1, Player *p2, Rectangle *pl, Re
 	{
 		CheckCollisionCircles(b2->pos, b2->radius,p2->pos,p2->radius)
 	};
-	DrawRectangleRec(*pr,RED);
-	DrawRectangleRec(*pl,GREEN);
+	
 	if(p1_button_collision && p2_button_collision){
 		*Game = VICTORY_MENU_STATE;	
 	}
@@ -155,13 +206,15 @@ int main()
 	{
 		.radius = P1_RADIUS,
 		.pos = {LEFT_SIDE_WINDOW_CENTER_X, WINDOW_HEIGHT/2.0f},
-		.vel = {500.0f,500.0f}
+		.vel = {500.0f,500.0f},
+		 GREEN
 	};
 	Player p2 =
 	{
 		.radius = P2_RADIUS,
 		.pos = {RIGHT_SIDE_WINDOW_CENTER_X, WINDOW_HEIGHT/2.0f},
-		.vel = {500.0f, 500.0f}
+		.vel = {500.0f, 500.0f},
+		RED
 	};
 
 	Rectangle boundary = 
@@ -174,12 +227,14 @@ int main()
 
 	Button b1 = {
 		50.0f ,
-		{60.0f, 60.0f}
+		{60.0f, 60.0f},
+		RED	
 	};
 	
 	Button b2 = {
 		50.0f ,
-		{1220.0f, 660.0f}
+		{1220.0f, 660.0f},
+		GREEN
 	};
 
 	Rectangle pressure_plate_rightside = 
@@ -197,6 +252,24 @@ int main()
 		100,
 		20	
 	};
+
+	Bullets p1_bullets[MAX_BULLETS];
+	for(int i = 0; i < MAX_BULLETS; i++){
+		p1_bullets[i].pos = (Vector2){0,0};
+		p1_bullets[i].vel = (Vector2){1000.0f, 1000.0f};
+		p1_bullets[i].radius = 5;
+		p1_bullets[i].color = GREEN;
+		p1_bullets[i].active = false;
+	}
+	
+	Bullets p2_bullets[MAX_BULLETS];
+	for(int i = 0; i < MAX_BULLETS; i++){
+		p2_bullets[i].pos = (Vector2){0,0};
+		p2_bullets[i].vel = (Vector2){1000.0f, 1000.0f};
+		p2_bullets[i].radius = 5;
+		p2_bullets[i].color = RED;
+		p2_bullets[i].active = false;
+	}
 	
   GameState Game = PLAYING_STATE;
 		
@@ -209,13 +282,24 @@ int main()
 	{
 		case PLAYING_STATE:
 			update_player(&p1, &p2, &boundary);
-			level_one(&b1,&b2,&p1,&p2,&pressure_plate_leftside,&pressure_plate_rightside,&Game);
+			level_one(&b1,&b2,&p1,&p2,&pressure_plate_leftside,&pressure_plate_rightside, p1_bullets, p2_bullets,&Game);
 
-			DrawCircleV(b1.pos, b1.radius,RED);
-			DrawCircleV(b2.pos, b2.radius,GREEN);
-			
-			DrawCircleV(p1.pos, p1.radius,GREEN);
-			DrawCircleV(p2.pos, p2.radius,RED);
+			DrawCircleV(b1.pos, b1.radius,b1.color);
+			DrawCircleV(b2.pos, b2.radius,b2.color);
+		
+			DrawCircleV(p1.pos, p1.radius,p1.color);
+			DrawCircleV(p2.pos, p2.radius,p2.color);
+
+			for(int i = 0; i < MAX_BULLETS; i++){
+				if(p1_bullets[i].active){
+					DrawCircleV(p1_bullets[i].pos, p1_bullets[i].radius, p1_bullets[i].color);
+				}
+				if(p2_bullets[i].active){
+					DrawCircleV(p2_bullets[i].pos, p2_bullets[i].radius, p2_bullets[i].color);
+				}
+			}
+			DrawRectangleRec(pressure_plate_rightside,RED);
+			DrawRectangleRec(pressure_plate_leftside,GREEN);
 			
 			DrawRectangleRec(boundary,YELLOW);	
 			
