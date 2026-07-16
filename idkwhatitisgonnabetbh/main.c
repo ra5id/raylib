@@ -15,6 +15,7 @@
 #define RIGHT_SIDE_WINDOW_CENTER_X 960.0f
 
 #define MAX_BULLETS 100
+#define BULLET_SPEED 1500.0f
 
 typedef enum{
 	START_MENU_STATE,
@@ -116,10 +117,61 @@ void update_player(Player *p1, Player *p2, Rectangle *boundary)
 	}
 }
 
-void level_one(Button *b1, Button *b2, Player *p1, Player *p2, Rectangle *pl, Rectangle *pr, Bullets *bullet1,Bullets *bullet2, GameState *Game)
+void level_one(Button *b1, Button *b2, Player *p1, Player *p2, Rectangle *pl, Rectangle *pr, Bullets *bullet1,Bullets *bullet2, bool *is_Task_completed, GameState *Game, i32 *count_p1, i32 *count_p2)
 {
 	f32 dt = GetFrameTime();
 	
+	for(int i = 0; i< MAX_BULLETS; i++){
+		if(IsKeyPressed(KEY_SPACE)){
+			if(!bullet1[i].active){
+				bullet1[i].active = true;
+				bullet1[i].pos = p1->pos;
+				bullet1[i].vel = (Vector2){0.0f,BULLET_SPEED};
+				break;
+			}
+
+		}
+		if(bullet1[i].active){
+			bullet1[i].pos.y += bullet1[i].vel.y * dt;
+			if(CheckCollisionCircleRec(bullet1[i].pos,bullet1[i].radius, *pl)){
+				*count_p1 += 1;
+				printf("HIT!\n");
+				bullet1[i].active = false;
+			}
+			if(bullet1[i].pos.y > WINDOW_HEIGHT){
+				bullet1[i].active = false;
+			}
+		}
+	}
+	
+	for(int i = 0; i< MAX_BULLETS; i++){
+		if(IsKeyPressed(KEY_KP_0)){
+			if(!bullet2[i].active){
+				bullet2[i].active = true;
+				bullet2[i].pos = p2->pos;
+				bullet2[i].vel = (Vector2){0.0f,BULLET_SPEED};
+				break;
+			}
+
+		}
+		if(bullet2[i].active){
+			bullet2[i].pos.y += bullet2[i].vel.y * dt;
+			if(CheckCollisionCircleRec(bullet2[i].pos,bullet2[i].radius, *pr)){
+				*count_p2 += 1;		
+				printf("HIT!\n");
+				bullet2[i].active = false;
+			}
+			if(bullet2[i].pos.y > WINDOW_HEIGHT){
+				bullet2[i].active = false;
+			}
+		}
+	}	
+	
+	if(*count_p1 > 50 && *count_p2 > 50){
+		*is_Task_completed = true;
+	}
+
+		
 	bool pleft_collision_check =
 	{
 		CheckCollisionCircleRec(p1->pos,p1->radius,*pl)
@@ -141,45 +193,6 @@ void level_one(Button *b1, Button *b2, Player *p1, Player *p2, Rectangle *pl, Re
 			p2->pos.y = pr->y-p2->radius;
 		}
 	}
-	
-	for(int i = 0; i< MAX_BULLETS; i++){
-		if(IsKeyPressed(KEY_SPACE)){
-			if(!bullet1[i].active){
-				bullet1[i].active = true;
-				bullet1[i].pos = p1->pos;
-				bullet1[i].vel = (Vector2){0.0f,1500.0f};
-				break;
-			}
-
-		}
-		if(bullet1[i].active){
-			bullet1[i].pos.y += bullet1[i].vel.y * dt;
-			if(bullet1[i].pos.y > WINDOW_HEIGHT){
-				bullet1[i].active = false;
-			}
-		}
-	}
-	
-	for(int i = 0; i< MAX_BULLETS; i++){
-		if(IsKeyPressed(KEY_SPACE)){
-			if(!bullet2[i].active){
-				bullet2[i].active = true;
-				bullet2[i].pos = p2->pos;
-				bullet2[i].vel = (Vector2){0.0f,1500.0f};
-				break;
-			}
-
-		}
-		if(bullet2[i].active){
-			bullet2[i].pos.y += bullet2[i].vel.y * dt;
-			if(bullet2[i].pos.y > WINDOW_HEIGHT){
-				bullet2[i].active = false;
-			}
-		}
-	}
-	
-	
-	
 
 	bool p1_button_collision = 
 	{
@@ -195,6 +208,12 @@ void level_one(Button *b1, Button *b2, Player *p1, Player *p2, Rectangle *pl, Re
 		*Game = VICTORY_MENU_STATE;	
 	}
 }
+	bool check_mouse_rec(Rectangle *object_rec){
+
+		Vector2 mouse = GetMousePosition();
+
+		return CheckCollisionPointRec(mouse,*object_rec);
+	}
 
 int main()
 {
@@ -270,34 +289,77 @@ int main()
 		p2_bullets[i].color = RED;
 		p2_bullets[i].active = false;
 	}
+
+	bool main_task_completed = false;
+	 
+	i16 textwidth = 	MeasureText("Start New Game!",80);
+	i16 fontsize = 80;
+	Rectangle game_start_text =
+	{
+		20,
+		WINDOW_HEIGHT-500,
+		textwidth,
+		fontsize
+	};
+
+	i32 level1_task_count_p1 = 0;
+	i32 level1_task_count_p2 = 0;
 	
-  GameState Game = PLAYING_STATE;
+  GameState Game = START_MENU_STATE;
 		
 	while(!WindowShouldClose())
-	{
+  {
 		BeginDrawing();
 		ClearBackground(BLACK);
+
+		f32 dt = GetFrameTime();
 	
 	switch(Game)
 	{
+
+		case START_MENU_STATE:
+			
+			DrawText("Start New Game!",20,WINDOW_HEIGHT-500,fontsize,WHITE);
+			if(check_mouse_rec(&game_start_text)){
+				fontsize = 120;
+				game_start_text.height = 120;
+				
+				if(IsMouseButtonPressed(MOUSE_LEFT_BUTTON)){
+					Game = PLAYING_STATE;
+				}
+
+			}else{
+				fontsize = 80;
+				game_start_text.height = 80;
+			}
+			break;
+
 		case PLAYING_STATE:
 			update_player(&p1, &p2, &boundary);
-			level_one(&b1,&b2,&p1,&p2,&pressure_plate_leftside,&pressure_plate_rightside, p1_bullets, p2_bullets,&Game);
+			level_one(&b1,&b2,&p1,&p2,&pressure_plate_leftside,&pressure_plate_rightside, p1_bullets, p2_bullets, &main_task_completed,&Game,&level1_task_count_p1, &level1_task_count_p2);
+			
 
-			DrawCircleV(b1.pos, b1.radius,b1.color);
-			DrawCircleV(b2.pos, b2.radius,b2.color);
-		
+			if(main_task_completed){
+				DrawCircleV(b1.pos, b1.radius,b1.color);
+				DrawCircleV(b2.pos, b2.radius,b2.color);
+			}
+			
 			DrawCircleV(p1.pos, p1.radius,p1.color);
 			DrawCircleV(p2.pos, p2.radius,p2.color);
-
+			
 			for(int i = 0; i < MAX_BULLETS; i++){
 				if(p1_bullets[i].active){
 					DrawCircleV(p1_bullets[i].pos, p1_bullets[i].radius, p1_bullets[i].color);
 				}
+			
 				if(p2_bullets[i].active){
 					DrawCircleV(p2_bullets[i].pos, p2_bullets[i].radius, p2_bullets[i].color);
 				}
 			}
+
+			DrawText(TextFormat("%d", level1_task_count_p1),40,0,20, WHITE);
+			DrawText(TextFormat("%d", level1_task_count_p2),WINDOW_WIDTH-40,0,20, WHITE);
+
 			DrawRectangleRec(pressure_plate_rightside,RED);
 			DrawRectangleRec(pressure_plate_leftside,GREEN);
 			
