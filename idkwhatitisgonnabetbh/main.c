@@ -208,12 +208,6 @@ void level_one(Button *b1, Button *b2, Player *p1, Player *p2, Rectangle *pl, Re
 		*Game = VICTORY_MENU_STATE;	
 	}
 }
-	bool check_mouse_rec(Rectangle *object_rec){
-
-		Vector2 mouse = GetMousePosition();
-
-		return CheckCollisionPointRec(mouse,*object_rec);
-	}
 
 int main()
 {
@@ -292,18 +286,42 @@ int main()
 
 	bool main_task_completed = false;
 	 
-	i16 textwidth = 	MeasureText("Start New Game!",80);
-	i16 fontsize = 80;
-	Rectangle game_start_text =
+	i8 count = 5;
+	i16 textwidth[5] = 	{MeasureText("Start New Game!",80),MeasureText("Continue!",60),MeasureText("Level selection?",60),MeasureText("Load Game...",60),MeasureText("Quit Game?",60)};
+
+	i16 textheight[5] = {80,60,60,60,60};
+
+	const	char *startmenu_texts[5] = 
 	{
-		20,
+		"Start New Game!",
+		"Continue!",
+		"Level selection?",
+		"Load Game...",
+		"Quit Game?"
+	};
+		
+	i16 text_x[5] = {20,20,20,20,20};
+
+	i16 text_y[5] = {
 		WINDOW_HEIGHT-500,
-		textwidth,
-		fontsize
+		WINDOW_HEIGHT-400,
+		WINDOW_HEIGHT-300,
+		WINDOW_HEIGHT-200,
+		WINDOW_HEIGHT-100,
+	};
+	
+	Rectangle game_startmenu_text[5] =
+	{
+		{text_x[0],text_y[0],textwidth[0],textheight[0]},
+		{text_x[1],text_y[1],textwidth[1],textheight[1]},
+		{text_x[2],text_y[2],textwidth[2],textheight[2]},
+		{text_x[3],text_y[3],textwidth[3],textheight[3]},
+		{text_x[4],text_y[4],textwidth[4],textheight[4]}
 	};
 
 	i32 level1_task_count_p1 = 0;
 	i32 level1_task_count_p2 = 0;
+
 	
   GameState Game = START_MENU_STATE;
 		
@@ -318,20 +336,35 @@ int main()
 	{
 
 		case START_MENU_STATE:
-			
-			DrawText("Start New Game!",20,WINDOW_HEIGHT-500,fontsize,WHITE);
-			if(check_mouse_rec(&game_start_text)){
-				fontsize = 120;
-				game_start_text.height = 120;
+			Vector2 mouse = GetMousePosition();
+			for(int i = 0; i < count; i++){
 				
-				if(IsMouseButtonPressed(MOUSE_LEFT_BUTTON)){
-					Game = PLAYING_STATE;
-				}
+				DrawText(startmenu_texts[i],text_x[i],text_y[i],textheight[i],WHITE);
+				
+				if(CheckCollisionPointRec(mouse,game_startmenu_text[i])){
+					if(i == 0){
+						textheight[i] = 120;
+						game_startmenu_text[i].height = 120;
+					}else{
+						textheight[i] = 100;
+						game_startmenu_text[i].height = 100;
+					}
+					if(i==0 && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)){
+						Game = PLAYING_STATE;
+					}
+				
 
-			}else{
-				fontsize = 80;
-				game_start_text.height = 80;
+				}else{
+					if(i==0){
+						textheight[i] = 80;
+						game_startmenu_text[i].height = 80;
+					}else{
+						textheight[i] = 60;
+						game_startmenu_text[i].height = 60;
+					}
+				}
 			}
+
 			break;
 
 		case PLAYING_STATE:
