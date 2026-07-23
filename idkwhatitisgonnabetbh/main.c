@@ -76,28 +76,28 @@ void update_player(Player *p1, Player *p2, Rectangle *boundary)
 	}
 		
 	if(p1->pos.x < p1->radius){
-		p1->pos.x = p1->radius;
+		 p1->pos.x = p1->radius;
 	}
 	if(p1->pos.y < p1->radius){
-		p1->pos.y = p1->radius;
+		 p1->pos.y = p1->radius;
 	}
 	if(p1->pos.x > WINDOW_WIDTH-p1->radius){
-		p1->pos.x = WINDOW_WIDTH-p1->radius;	
+		 p1->pos.x = WINDOW_WIDTH-p1->radius;	
 	}
 	if(p1->pos.y > WINDOW_HEIGHT-p1->radius){
-		p1->pos.y = WINDOW_HEIGHT-p1->radius;	
+		 p1->pos.y = WINDOW_HEIGHT-p1->radius;	
 	}
 	if(p2->pos.x < p2->radius){
-		p2->pos.x = p2->radius;
+		 p2->pos.x = p2->radius;
 	}
 	if(p2->pos.y < p2->radius){
-		p2->pos.y = p2->radius;
+		 p2->pos.y = p2->radius;
 	}
 	if(p2->pos.x > WINDOW_WIDTH-p2->radius){
-		p2->pos.x = WINDOW_WIDTH-p2->radius;	
+		 p2->pos.x = WINDOW_WIDTH-p2->radius;	
 	}
 	if(p2->pos.y > WINDOW_HEIGHT-p2->radius){
-		p2->pos.y = WINDOW_HEIGHT-p2->radius;	
+		 p2->pos.y = WINDOW_HEIGHT-p2->radius;	
 	}
   
 	bool boundry_collision_p1 = 
@@ -124,22 +124,22 @@ void level_one(Button *b1, Button *b2, Player *p1, Player *p2, Rectangle *pl, Re
 	for(int i = 0; i< MAX_BULLETS; i++){
 		if(IsKeyPressed(KEY_SPACE)){
 			if(!bullet1[i].active){
-				bullet1[i].active = true;
-				bullet1[i].pos = p1->pos;
-				bullet1[i].vel = (Vector2){0.0f,BULLET_SPEED};
-				break;
+					bullet1[i].active = true;
+					bullet1[i].pos = p1->pos;
+					bullet1[i].vel = (Vector2){0.0f,BULLET_SPEED};
+					break;
 			}
 
 		}
 		if(bullet1[i].active){
-			bullet1[i].pos.y += bullet1[i].vel.y * dt;
+			 bullet1[i].pos.y += bullet1[i].vel.y * dt;
 			if(CheckCollisionCircleRec(bullet1[i].pos,bullet1[i].radius, *pl)){
 				*count_p1 += 1;
-				printf("HIT!\n");
-				bullet1[i].active = false;
+				 printf("HIT!\n");
+				 bullet1[i].active = false;
 			}
 			if(bullet1[i].pos.y > WINDOW_HEIGHT){
-				bullet1[i].active = false;
+				 bullet1[i].active = false;
 			}
 		}
 	}
@@ -147,22 +147,22 @@ void level_one(Button *b1, Button *b2, Player *p1, Player *p2, Rectangle *pl, Re
 	for(int i = 0; i< MAX_BULLETS; i++){
 		if(IsKeyPressed(KEY_KP_0)){
 			if(!bullet2[i].active){
-				bullet2[i].active = true;
-				bullet2[i].pos = p2->pos;
-				bullet2[i].vel = (Vector2){0.0f,BULLET_SPEED};
-				break;
+					bullet2[i].active = true;
+					bullet2[i].pos = p2->pos;
+					bullet2[i].vel = (Vector2){0.0f,BULLET_SPEED};
+					break;
 			}
 
 		}
 		if(bullet2[i].active){
-			bullet2[i].pos.y += bullet2[i].vel.y * dt;
+			 bullet2[i].pos.y += bullet2[i].vel.y * dt;
 			if(CheckCollisionCircleRec(bullet2[i].pos,bullet2[i].radius, *pr)){
 				*count_p2 += 1;		
-				printf("HIT!\n");
-				bullet2[i].active = false;
+				 printf("HIT!\n");
+				 bullet2[i].active = false;
 			}
 			if(bullet2[i].pos.y > WINDOW_HEIGHT){
-				bullet2[i].active = false;
+				 bullet2[i].active = false;
 			}
 		}
 	}	
@@ -184,13 +184,13 @@ void level_one(Button *b1, Button *b2, Player *p1, Player *p2, Rectangle *pl, Re
 
 	if(pleft_collision_check){
 		if(p1->pos.y-p1->radius < pl->y){
-			p1->pos.y = pl->y-p1->radius;
+			 p1->pos.y = pl->y-p1->radius;
 		}
 	}
 	
 	if(pright_collision_check){
 		if(p2->pos.y-p2->radius < pr->y){
-			p2->pos.y = pr->y-p2->radius;
+			 p2->pos.y = pr->y-p2->radius;
 		}
 	}
 
@@ -227,7 +227,7 @@ int main()
 		.radius = P2_RADIUS,
 		.pos = {RIGHT_SIDE_WINDOW_CENTER_X, WINDOW_HEIGHT/2.0f},
 		.vel = {500.0f, 500.0f},
-		RED
+	   RED
 	};
 
 	Rectangle boundary = 
@@ -322,7 +322,7 @@ int main()
 	i32 level1_task_count_p1 = 0;
 	i32 level1_task_count_p2 = 0;
 	
-	i8 selected_menu_text = 0;
+	i8 selected_menu_text = -1;
 
   GameState Game = START_MENU_STATE;
 		
@@ -337,22 +337,20 @@ int main()
 	{
 
 		case START_MENU_STATE:
-			if(IsKeyPressed(KEY_UP)){
-				if(selected_menu_text > 0){
+			if(selected_menu_text >= 0 && selected_menu_text <= 4){
+				if(IsKeyPressed(KEY_UP) && selected_menu_text > 0){
 					selected_menu_text -= 1;
+				}if(IsKeyPressed(KEY_DOWN) && selected_menu_text < 4){
+						selected_menu_text += 1;
 				}
-			}
-			if(IsKeyPressed(KEY_DOWN)){
-				if(selected_menu_text < 4){
-					selected_menu_text += 1;
+			}else{
+				if(IsKeyPressed(KEY_UP) || IsKeyPressed(KEY_DOWN)){
+					selected_menu_text = 0;
 				}
 			}
 			Vector2 mouse = GetMousePosition();
 			
 			for(int i = 0; i < count; i++){
-				
-				DrawText(startmenu_texts[i],text_x[i],text_y[i],textheight[i],WHITE);
-				
 				if(CheckCollisionPointRec(mouse,game_startmenu_text[i])){
 					selected_menu_text = i;
 						
@@ -380,6 +378,13 @@ int main()
 				if(selected_menu_text == 0 && IsKeyPressed(KEY_ENTER)){
 					Game = PLAYING_STATE;
 				}
+				DrawText(
+					startmenu_texts[i],
+					text_x[i],
+					text_y[i],
+					textheight[i],
+					WHITE
+				);
 			}	
 			break;
 
