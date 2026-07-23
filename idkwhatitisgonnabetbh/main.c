@@ -321,8 +321,9 @@ int main()
 
 	i32 level1_task_count_p1 = 0;
 	i32 level1_task_count_p2 = 0;
-
 	
+	i8 selected_menu_text = 0;
+
   GameState Game = START_MENU_STATE;
 		
 	while(!WindowShouldClose())
@@ -336,35 +337,50 @@ int main()
 	{
 
 		case START_MENU_STATE:
+			if(IsKeyPressed(KEY_UP)){
+				if(selected_menu_text > 0){
+					selected_menu_text -= 1;
+				}
+			}
+			if(IsKeyPressed(KEY_DOWN)){
+				if(selected_menu_text < 4){
+					selected_menu_text += 1;
+				}
+			}
 			Vector2 mouse = GetMousePosition();
+			
 			for(int i = 0; i < count; i++){
 				
 				DrawText(startmenu_texts[i],text_x[i],text_y[i],textheight[i],WHITE);
 				
 				if(CheckCollisionPointRec(mouse,game_startmenu_text[i])){
-					if(i == 0){
-						textheight[i] = 120;
-						game_startmenu_text[i].height = 120;
-					}else{
-						textheight[i] = 100;
-						game_startmenu_text[i].height = 100;
-					}
+					selected_menu_text = i;
+						
 					if(i==0 && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)){
 						Game = PLAYING_STATE;
-					}
-				
-
+					}	
+				}
+				if(selected_menu_text == i){
+						if(i == 0){
+								textheight[i] = 120;
+								game_startmenu_text[i].height = 120;
+						}else{
+								textheight[i] = 100;
+								game_startmenu_text[i].height = 100;
+						}
 				}else{
-					if(i==0){
+					if(i == 0){
 						textheight[i] = 80;
 						game_startmenu_text[i].height = 80;
 					}else{
 						textheight[i] = 60;
 						game_startmenu_text[i].height = 60;
-					}
+					}	
 				}
-			}
-
+				if(selected_menu_text == 0 && IsKeyPressed(KEY_ENTER)){
+					Game = PLAYING_STATE;
+				}
+			}	
 			break;
 
 		case PLAYING_STATE:
