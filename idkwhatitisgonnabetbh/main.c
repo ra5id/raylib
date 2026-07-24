@@ -333,7 +333,8 @@ int main()
 
   GameState Game = START_MENU_STATE;
 		
-	while(!WindowShouldClose())
+	bool running = true;
+	while(!WindowShouldClose() && running)
   {
 		BeginDrawing();
 		ClearBackground(BLACK);
@@ -386,6 +387,18 @@ int main()
 				}
 				if(selected_menu_text == 0 && IsKeyPressed(KEY_ENTER)){
 					Game = PLAYING_STATE;
+				}
+				if(selected_menu_text == 1 && IsKeyPressed(KEY_ENTER)){
+					Game = PLAYING_STATE;
+				}
+				if(selected_menu_text == 2 && IsKeyPressed(KEY_ENTER)){
+					Game = START_MENU_STATE;
+				}
+				if(selected_menu_text == 3 && IsKeyPressed(KEY_ENTER)){
+					Game = START_MENU_STATE;
+				}
+				if(selected_menu_text == 4 && IsKeyPressed(KEY_ENTER)){
+					running = false;	
 				}
 				DrawText(
 					startmenu_texts[i],
