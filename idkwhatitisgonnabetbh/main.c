@@ -318,6 +318,13 @@ int main()
 		{text_x[3],text_y[3],textwidth[3],textheight[3]},
 		{text_x[4],text_y[4],textwidth[4],textheight[4]}
 	};
+	 Color menu_text_color[5] = {
+		 WHITE,
+		 WHITE,
+		 WHITE,
+		 WHITE,
+		 WHITE
+	 };
 
 	i32 level1_task_count_p1 = 0;
 	i32 level1_task_count_p2 = 0;
@@ -366,6 +373,7 @@ int main()
 								textheight[i] = 100;
 								game_startmenu_text[i].height = 100;
 						}
+						menu_text_color[i] = GREEN;
 				}else{
 					if(i == 0){
 						textheight[i] = 80;
@@ -374,6 +382,7 @@ int main()
 						textheight[i] = 60;
 						game_startmenu_text[i].height = 60;
 					}	
+					menu_text_color[i] = WHITE; 
 				}
 				if(selected_menu_text == 0 && IsKeyPressed(KEY_ENTER)){
 					Game = PLAYING_STATE;
@@ -383,7 +392,7 @@ int main()
 					text_x[i],
 					text_y[i],
 					textheight[i],
-					WHITE
+					menu_text_color[i]
 				);
 			}	
 			break;
