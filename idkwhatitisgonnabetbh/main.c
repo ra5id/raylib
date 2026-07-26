@@ -45,6 +45,13 @@ typedef struct{
 	bool active;
 }Bullets;
 
+typedef struct{
+	Player p1;
+	Player p2;
+
+	bool main_task_completed;
+}Game;
+ 
 void update_player(Player *p1, Player *p2, Rectangle *boundary)
 {
 	f32 dt; dt = GetFrameTime();
@@ -204,9 +211,33 @@ void level_one(Button *b1, Button *b2, Player *p1, Player *p2, Rectangle *pl, Re
 		CheckCollisionCircles(b2->pos, b2->radius,p2->pos,p2->radius)
 	};
 	
-	if(p1_button_collision && p2_button_collision){
+	if(p1_button_collision && p2_button_collision && *is_Task_completed){
 		*Game = VICTORY_MENU_STATE;	
 	}
+}
+
+bool SaveGame(Game *game)
+{
+	FILE *file =fopen("savefiles/save.dat","wb");
+	if(!file){
+		return false;
+	}
+
+	fwrite(game, sizeof(Game),1,file);
+
+	fclose(file);
+	return true;
+}
+bool LoadGame(Game *game){
+	FILE *file = fopen("savefiles/save.dat", "rb");
+
+	if(!file){
+		return false;
+	}
+	fread(game,sizeof(Game), 1, file);
+
+	fclose(file);
+	return true;
 }
 
 int main()
@@ -214,20 +245,11 @@ int main()
 
 	InitWindow(WINDOW_WIDTH,WINDOW_HEIGHT,"idk tbh, something two players can play ig");
 
-	
-	Player p1 =
-	{
-		.radius = P1_RADIUS,
-		.pos = {LEFT_SIDE_WINDOW_CENTER_X, WINDOW_HEIGHT/2.0f},
-		.vel = {500.0f,500.0f},
-		 GREEN
-	};
-	Player p2 =
-	{
-		.radius = P2_RADIUS,
-		.pos = {RIGHT_SIDE_WINDOW_CENTER_X, WINDOW_HEIGHT/2.0f},
-		.vel = {500.0f, 500.0f},
-	   RED
+	Game game = {
+		{.radius = P1_RADIUS, .pos = {LEFT_SIDE_WINDOW_CENTER_X, WINDOW_HEIGHT/2.0f}, .vel = {500.0f,500.0f},
+		  GREEN},
+		{.radius = P2_RADIUS, .pos = {RIGHT_SIDE_WINDOW_CENTER_X, WINDOW_HEIGHT/2.0f}, .vel = {500.0f, 500.0f}, RED}, 
+		false
 	};
 
 	Rectangle boundary = 
@@ -284,7 +306,7 @@ int main()
 		p2_bullets[i].active = false;
 	}
 
-	bool main_task_completed = false;
+
 	 
 	i8 count = 5;
 	i16 textwidth[5] = 	{MeasureText("Start New Game!",80),MeasureText("Continue!",60),MeasureText("Level selection?",60),MeasureText("Load Game...",60),MeasureText("Quit Game?",60)};
@@ -330,6 +352,7 @@ int main()
 	i32 level1_task_count_p2 = 0;
 	
 	i8 selected_menu_text = -1;
+
 
   GameState Game = START_MENU_STATE;
 		
@@ -389,6 +412,7 @@ int main()
 					Game = PLAYING_STATE;
 				}
 				if(selected_menu_text == 1 && IsKeyPressed(KEY_ENTER)){
+					LoadGame(&game);
 					Game = PLAYING_STATE;
 				}
 				if(selected_menu_text == 2 && IsKeyPressed(KEY_ENTER)){
@@ -411,17 +435,17 @@ int main()
 			break;
 
 		case PLAYING_STATE:
-			update_player(&p1, &p2, &boundary);
-			level_one(&b1,&b2,&p1,&p2,&pressure_plate_leftside,&pressure_plate_rightside, p1_bullets, p2_bullets, &main_task_completed,&Game,&level1_task_count_p1, &level1_task_count_p2);
+			update_player(&game.p1, &game.p2, &boundary);
+			level_one(&b1,&b2,&game.p1, &game.p2,&pressure_plate_leftside,&pressure_plate_rightside, p1_bullets, p2_bullets, &game.main_task_completed,&Game,&level1_task_count_p1, &level1_task_count_p2);
 			
 
-			if(main_task_completed){
+			if(game.main_task_completed){
 				DrawCircleV(b1.pos, b1.radius,b1.color);
 				DrawCircleV(b2.pos, b2.radius,b2.color);
 			}
 			
-			DrawCircleV(p1.pos, p1.radius,p1.color);
-			DrawCircleV(p2.pos, p2.radius,p2.color);
+			DrawCircleV(game.p1.pos, game.p1.radius,game.p1.color);
+			DrawCircleV(game.p2.pos, game.p2.radius,game.p2.color);
 			
 			for(int i = 0; i < MAX_BULLETS; i++){
 				if(p1_bullets[i].active){
@@ -440,7 +464,7 @@ int main()
 			DrawRectangleRec(pressure_plate_leftside,GREEN);
 			
 			DrawRectangleRec(boundary,YELLOW);	
-			
+			 SaveGame(&game);
 			break;
 
 		case VICTORY_MENU_STATE:
