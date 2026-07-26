@@ -218,6 +218,7 @@ void level_one(Button *b1, Button *b2, Player *p1, Player *p2, Rectangle *pl, Re
 
 bool SaveGame(Game *game)
 {
+	
 	FILE *file =fopen("savefiles/save.dat","wb");
 	if(!file){
 		return false;
@@ -226,6 +227,7 @@ bool SaveGame(Game *game)
 	fwrite(game, sizeof(Game),1,file);
 
 	fclose(file);
+
 	return true;
 }
 bool LoadGame(Game *game){
@@ -239,6 +241,15 @@ bool LoadGame(Game *game){
 	fclose(file);
 	return true;
 }
+ void resetgame(Game *game){
+		game->main_task_completed = false;
+		game->p1.pos = (Vector2){LEFT_SIDE_WINDOW_CENTER_X, WINDOW_HEIGHT/2.0f};
+		game->p2.pos = (Vector2){RIGHT_SIDE_WINDOW_CENTER_X, WINDOW_HEIGHT/2.0f}; 
+		game->p1.vel = (Vector2){500.0f,500.0f};
+		game->p2.vel = (Vector2){500.0f,500.0f};
+		game->p2.radius = P2_RADIUS; 
+		game->p1.radius = P1_RADIUS; 
+ }
 
 int main()
 {
@@ -411,9 +422,15 @@ int main()
 				if(selected_menu_text == 0 && IsKeyPressed(KEY_ENTER)){
 					Game = PLAYING_STATE;
 				}
-				if(selected_menu_text == 1 && IsKeyPressed(KEY_ENTER)){
+				if(selected_menu_text == 1 && IsKeyPressed(KEY_ENTER)){ 
 					LoadGame(&game);
 					Game = PLAYING_STATE;
+					if(VICTORY_MENU_STATE && game.main_task_completed) 
+					{
+						resetgame(&game);
+					}
+
+					
 				}
 				if(selected_menu_text == 2 && IsKeyPressed(KEY_ENTER)){
 					Game = START_MENU_STATE;
@@ -464,7 +481,8 @@ int main()
 			DrawRectangleRec(pressure_plate_leftside,GREEN);
 			
 			DrawRectangleRec(boundary,YELLOW);	
-			 SaveGame(&game);
+			
+			SaveGame(&game);
 			break;
 
 		case VICTORY_MENU_STATE:
