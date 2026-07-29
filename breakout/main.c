@@ -139,6 +139,7 @@ void update_bricks(Brick bricks[BRICK_ROWS][BRICK_COLS], Vec2 *ball_pos, Vec2 *b
 	for(i32 row = 0; row < BRICK_ROWS; row ++){
 		for(i32 col = 0; col < BRICK_COLS; col++){
 			Brick *brick = &bricks[row][col];
+
 			if(!brick->is_alive){
 				continue;
 			}
@@ -169,6 +170,7 @@ void update_bricks(Brick bricks[BRICK_ROWS][BRICK_COLS], Vec2 *ball_pos, Vec2 *b
 void reset_bricks(Brick bricks[BRICK_ROWS][BRICK_COLS])
   {
     for (i32 row = 0; row < BRICK_ROWS; row++) {
+			
         for (i32 col = 0; col < BRICK_COLS; col++) {
             Brick *brick = &bricks[row][col];
               brick->x = 27.5f + col * 75.0f;
