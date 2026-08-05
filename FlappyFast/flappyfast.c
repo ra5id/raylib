@@ -1,5 +1,6 @@
 #include <raylib.h>
 #include <stdio.h>
+#include <stdbool.h>
 
 #define WINDOWWIDTH		800
 #define WINDOWMIDDLEX	400
@@ -45,7 +46,7 @@ void update_flappy(Player *flappy)
 	}
 }
 
-void update_pipes(Rectangle *pipes, float *PipesXDisplacement) {
+void update_pipes(Rectangle *pipes, float *PipesXDisplacement, bool *amLazyForgiveMe ) {
 
 	float dt = GetFrameTime();
 	
@@ -56,6 +57,7 @@ void update_pipes(Rectangle *pipes, float *PipesXDisplacement) {
 
 		if (pipes[i].x < (-pipes->width * 2)) {
 
+			amLazyForgiveMe[i] = true;
 			pipes[i].x = 800;
 			pipes[i + 1].x = 800;
 
@@ -103,8 +105,12 @@ int main()
 		{ { WINDOWMIDDLEX, WINDOWMIDDLEY }, 150.0f, 500.0f, 10, false }
 	};
 
+	bool amLazyForgiveMe[MAXPIPES];
+	for(int i = 0; i < MAXPIPES; i++){
+		amLazyForgiveMe[i] = false;
+	}
 
-	float PipesXDisplacement = 800;
+	float PipesXDisplacement = 0;
 	
 	Rectangle pipes[MAXPIPES] = {
 		{ PipesXDisplacement, 0, 80, 240 },
@@ -144,16 +150,18 @@ int main()
 			if (IsKeyPressed(KEY_SPACE)) { game.flappy.IsMoving = true; }
 			if (game.flappy.IsMoving) {
 				update_flappy(&game.flappy);
-				update_pipes(pipes, &PipesXDisplacement);
+				update_pipes(pipes, &PipesXDisplacement, amLazyForgiveMe);
+			}
+			
+			for (int i = 0; i < MAXPIPES; i++) {
+				if(amLazyForgiveMe[i]){
+					DrawRectangleRec(pipes[i], WHITE);
+				}
 				if (collision(pipes, &game.flappy)) {
 					state = GAMEOVER;
 				}
 			}
-
-			for (int i = 0; i < MAXPIPES; i++) {
-				DrawRectangleRec(pipes[i], WHITE);
-			}
-			DrawCircleV(game.flappy.pos, game.flappy.radius, BLUE);
+			DrawCircleV(game.flappy.pos,game.flappy.radius, BLUE);
 			break;
 
 		case GAMEOVER:
